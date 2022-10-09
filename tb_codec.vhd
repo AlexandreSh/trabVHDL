@@ -16,7 +16,7 @@ begin
 		port map(interrupt, read_signal, write_signal, valid, codec_data_in, codec_data_out);
 
 	estimulo: process is
-		variable resultado: dados1byte;
+	--	variable resultado: dados1byte;
 		type tab_ver is record
 			interrupt, read_signal, write_signal, valid: std_logic;
 			codec_data_in, codec_data_out: std_logic_vector(7 downto 0); --onde é que eu coloco os arquivosssS??????
@@ -31,25 +31,23 @@ begin
 		(	'1'	,	'1'		  ,		'1'		,	'0'	,"11111111"	,  "00000000"	), --daqui pra baixo testa entradas invalidas
 		(	'1'	,	'0'		  ,		'0'		,	'0'	,"11111111"	,  "00000000"	),
 		(	'0'	,	'1'		  ,		'1'		,	'0'	,"11111111"	,  "00000000"	),
-		(	'0'	,	'0'		  ,		'0'		,	'0'	,"11111111"	,  "00000000"	),
-
-		)
+		(	'0'	,	'0'		  ,		'0'		,	'0'	,"11111111"	,  "00000000"	)		);
 
 		begin 
 			for i in tabela_verdade'range loop
-				interrupt		<=tabela_verdade(i).interrupt
-				read_signal		<=tabela_verdade(i).read_signal
-				write_signal	<=tabela_verdade(i).write_signal
+				interrupt		<=tabela_verdade(i).interrupt;
+				read_signal		<=tabela_verdade(i).read_signal;
+				write_signal	<=tabela_verdade(i).write_signal;
 				wait for 1 ns;
 				if i<2 then 			--valida dataout
 					assert codec_data_out = tabela_verdade(i).codec_data_out report "ERRO NO DATAOUT";
-				else if i>=2 and i<5 then--valida datain
+				elsif i>=2 and i<5 then--valida datain
 					assert codec_data_in = tabela_verdade(i).codec_data_in report "ERRO NO DATAIN";
 				end if;
 				assert valid = tabela_verdade(i).valid report "ERRO NA VALIDACAO";
 			end loop;
 		report "fim de teste";
-
+		wait;
 	end process;
 	
 
