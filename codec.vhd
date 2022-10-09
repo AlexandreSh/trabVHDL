@@ -30,8 +30,8 @@ begin
         begin
 
 
-            if ((read_signal = '1')|(write_signal = '0')) then      --instrução IN (read)
-                file_open(statis, arq_carga, nome_arquivo(1 to tam_nome_arq), read_mode);
+            if ((read_signal = '1')and(write_signal = '0')) then      --instrução IN (read)
+                file_open(status, arq_carga, nome_arquivo(1 to tam_nome_arq), read_mode);
                 if status /= open_ok then
                     report "ERRO NA LEITURA DO ARQUIVO" severity warning;
                 else
@@ -39,8 +39,8 @@ begin
                     codec_data_out <= aux1b; --disponibiliza os dados na variavel de saída
                     valid <= '1';            --sinaliza leitura com sucesso
                 end if;
-            elsif ((read_signal = '0')|(write_signal = '1')) then   --instrução OUT (write)
-                file_open(statis, arq_carga, nome_arquivo(1 to tam_nome_arq), write_mode);
+            elsif ((read_signal = '0')and(write_signal = '1')) then   --instrução OUT (write)
+                file_open(status, arq_carga, nome_arquivo(1 to tam_nome_arq), write_mode);
                 if status /= open_ok then
                     report "ERRO NA LEITURA DO ARQUIVO" severity warning;
                 else
