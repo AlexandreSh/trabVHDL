@@ -31,9 +31,9 @@ begin
         deallocate(linha_dados_in);
         if ((read_signal = '1')and(write_signal = '0')and(rising_edge(interrupt))) then      --instrução IN (read)
             if not endfile(arq_entrada) then
-                readline(arq_entrada, linha_dados_in);  --lê o arquivo e salva na variavel auxiliar
-                hread(linha_dados_in, aux);
-                report linha_dados_in.all;
+                readline(arq_entrada, linha_dados_out);  --lê o arquivo e salva na variavel auxiliar
+         --       report linha_dados_out.all;
+                hread(linha_dados_out, aux);
                 codec_data_out <= std_logic_vector(aux); --disponibiliza os dados na variavel de saída
                 valid <= '1';            --sinaliza leitura com sucesso
             else
@@ -41,13 +41,11 @@ begin
             end if;
         elsif ((read_signal = '0')and(write_signal = '1')and(rising_edge(interrupt))) then   --instrução OUT (write)
             
-            write(linha_dados_out, codec_data_out);
-            report linha_dados_out.all;
+            write(linha_dados_in, codec_data_in);
+        --    report linha_dados_in.all;
 --            linha_dados_out := to_string(codec_data_in);
-            writeline(arq_saida, linha_dados_out); --escreve os dados de linha_dados_out no arquivo
+            writeline(arq_saida, linha_dados_in); --escreve os dados de linha_dados_out no arquivo
             valid <= '1'; --sinaliza escrita com sucesso
-        else
-            valid <= '0';                                       --em caso de pedido não esperado
         end if;
 
         end process;

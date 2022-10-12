@@ -22,7 +22,7 @@ begin
         variable message: line;
         file arq_entrada: text is "/home/alex/Documents/LabHardware/T1/trabVHDL/entrada_codec.dat";
         file arq_saida: text open write_mode is "/home/alex/Documents/LabHardware/T1/trabVHDL/saida_codec.dat";
-	--	variable resultado: dados1byte;
+		variable resultado: dados1byte;
 		type tab_ver is record
 			interrupt, read_signal, write_signal, valid: std_logic;
 			codec_data_in, codec_data_out: std_logic_vector(7 downto 0); 
@@ -30,10 +30,10 @@ begin
 		type vet_tab_ver is array (0 to 15) of tab_ver;
 		constant tabela_verdade: vet_tab_ver := (
 	--	interrupt, read_signal, write_signal, valid, codec_data_in, codec_data_out	
-		(	'1'	,	'0'		  ,		'1'		,	'1'	,"11111111"	,  "00000000"	),
-		(	'0'	,	'0'		  ,		'1'		,	'1'	,"11111111"	,  "00000000"	),
-		(	'1'	,	'0'		  ,		'1'		,	'1'	,"11111111"	,  "00000000"	),
-		(	'0'	,	'0'		  ,		'1'		,	'1'	,"11111111"	,  "00000000"	),
+		(	'1'	,	'0'		  ,		'1'		,	'1'	,"00110011"	,  "11111111"	),
+		(	'0'	,	'0'		  ,		'1'		,	'1'	,"00110011"	,  "11111111"	),
+		(	'1'	,	'0'		  ,		'1'		,	'1'	,"00000000"	,  "11111111"	),
+		(	'0'	,	'0'		  ,		'1'		,	'1'	,"00000000"	,  "11111111"	),
 		(	'1'	,	'1'		  ,		'0'		,	'1'	,"00000000"	,  "00000000"	),
 		(	'0'	,	'1'		  ,		'0'		,	'1'	,"00000000"	,  "00000000"	),
 		(	'1'	,	'1'		  ,		'0'		,	'1'	,"00000000"	,  "00000000"	),
@@ -55,25 +55,26 @@ begin
 				read_signal		<=tabela_verdade(i).read_signal;
 				write_signal	<=tabela_verdade(i).write_signal;
 				codec_data_out	<=tabela_verdade(i).codec_data_out;
+				codec_data_in 	<=tabela_verdade(i).codec_data_in;
 				wait for 1 ns;
 				if ((i mod 2) = 1) then
 					deallocate(message);
 					if i<4 then 			--valida dataout
-						write(message, string'("ERRO NO DATAOUT "));
-						write(message, codec_data_out);
+						write(message, string'("ERRO NO DATAIN "));
+						write(message, codec_data_in);
 						write(message, string'(" recebido mas "));
-						write(message, tabela_verdade(i).codec_data_out);
+						write(message, tabela_verdade(i).codec_data_in);
 						write(message, string'(" esperado "));
 						assert codec_data_in = tabela_verdade(i).codec_data_in report message.all;
 					elsif i>=4 and i<8 then--valida datain
-						write(message, string'("ERRO NO DATAIN "));
+						write(message, string'("ERRO NO DATAOUT "));
 						write(message, codec_data_out);
 						write(message, string'(" recebido mas "));
 						write(message, tabela_verdade(i).codec_data_out);
 						write(message, string'(" esperado "));
 						assert codec_data_out = tabela_verdade(i).codec_data_out report message.all;
 					end if;
-					assert valid = tabela_verdade(i).valid report "ERRO NA VALIDACAO";
+					assert valid = tabela_verdade(i).valid report "ERRO NA VALIDACAO"; --erro esperado após a 9a linha
 				end if;
 			end loop;
 		report "fim de teste";
