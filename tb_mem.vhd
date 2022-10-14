@@ -22,33 +22,39 @@ begin
 	estimulo: process is
 		type tab_ver is record
 			clock, data_read, data_write: std_logic;
-			data_addr   : std_logic_vector(addr_width-1 downto 0);
-            data_in     : std_logic_vector(data_width-1 downto 0);
-            data_out    : std_logic_vector((data_width*4)-1 downto 0);
+			data_addr   : std_logic_vector(addr_width-1 downto 0); --16
+            data_in     : std_logic_vector(data_width-1 downto 0); --8
+            data_out    : std_logic_vector((data_width*4)-1 downto 0); --64
 		end record;
-		type vet_tab_ver is array (0 to 9) of tab_ver;
+		type vet_tab_ver is array (0 to 12) of tab_ver;
 		constant tabela_verdade: vet_tab_ver := (
-	--	clock,   data_read,  data_write,  data_addr, data_in,     data_out
-		(	'0'	,	'0'	  ,		'1'		,"0000000000000000" ,"00010000"	,  "00000000000000000000000000000000"	),  --testa escrita
-		(	'1'	,	'0'	  ,		'1'		,"0000000000001000" ,"00011110"	,  "00000000000000000000000000000000"	),
-		(	'0'	,	'1'	  ,		'0'		,"0000000000000000" ,"00000000"	,  "00000000000000000000000000010000"	),  --testa leitura
-		(	'1'	,	'1'	  ,		'0'		,"0000000000000000" ,"00000000"	,  "00000000000000000000000000010000"	),
-		(	'0'	,	'1'	  ,		'0'		,"0000000000000000" ,"00000000"	,  "00000000000000000000000000010000"	), 
-		(	'1'	,	'1'	  ,		'0'		,"0000000000000000" ,"00000000"	,  "00000000000000000000000000010000"	),
-		(	'0'	,	'1'	  ,		'0'		,"0000000000001000" ,"00000000"	,  "00000000000000000000000000011110"	),  
-		(	'1'	,	'1'	  ,		'0'		,"0000000000001000" ,"00000000"	,  "00000000000000000000000000011110"	),
-		(	'0'	,	'1'	  ,		'0'		,"0000000000001000" ,"00000000"	,  "00000000000000000000000000011110"	),  
-		(	'1'	,	'1'	  ,		'0'		,"0000000000001000" ,"00000000"	,  "00000000000000000000000000011110"	)		);
+	-- 	  clock,  data_read, data_write,  data_addr,	data_in,   		 data_out
+		(	'1'	,	'0'	  ,		'1'		,X"0000" ,		X"00"	,  X"00000000"	),
+		(	'0'	,	'0'	  ,		'1'		,X"0000" ,  	X"00"	,  X"00000000"	),  --testa escrita
+		(	'1'	,	'0'	  ,		'1'		,X"0000" ,		X"00"	,  X"00000000"	),
+		(	'0'	,	'0'	  ,		'1'		,X"0001" ,  	X"11"	,  X"00000000"	),  
+		(	'1'	,	'0'	  ,		'1'		,X"0001" ,		X"11"	,  X"00000000"	),
+		(	'0'	,	'1'	  ,		'0'		,X"0000" ,		X"00"	,  X"00000010"	),  --testa leitura
+		(	'1'	,	'1'	  ,		'0'		,X"0000" ,		X"00"	,  X"00000010"	),
+		(	'0'	,	'1'	  ,		'0'		,X"0000" ,		X"00"	,  X"00000010"	), 
+		(	'1'	,	'1'	  ,		'0'		,X"0000" ,		X"00"	,  X"00000010"	),
+		(	'0'	,	'1'	  ,		'0'		,X"0001" ,		X"00"	,  X"00000011"	),  
+		(	'1'	,	'1'	  ,		'0'		,X"0001" ,		X"00"	,  X"00000011"	),
+		(	'0'	,	'1'	  ,		'0'		,X"0001" ,		X"00"	,  X"00000011"	),  
+		(	'1'	,	'1'	  ,		'0'		,X"0001" ,		X"00"	,  X"00000011"	)		);
 
 		begin 
-			for i in 0 to 9 loop
+			for i in vet_tab_ver'range loop
 				clock		    <=tabela_verdade(i).clock;
 				data_read		<=tabela_verdade(i).data_read;
 				data_write	    <=tabela_verdade(i).data_write;
 				data_addr	    <=tabela_verdade(i).data_addr;
 				data_in	        <=tabela_verdade(i).data_in;
+				data_out	        <=tabela_verdade(i).data_out;
 				wait for 1 ns;
-				if i>=2 then--valida leitura (e também escrita feita anteriormente)
+
+                report to_String(i);
+				if i>=5 then--valida leitura (e também escrita feita anteriormente)
 					assert data_out = tabela_verdade(i).data_out report "ERRO";
 				end if;
 			end loop;
