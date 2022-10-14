@@ -33,8 +33,8 @@ begin
 		type vet_tab_ver is array (0 to 10) of tab_ver;
 		constant tabela_verdade: vet_tab_ver := (
 	-- 	  clock,  data_read, data_write,  data_addr,	data_in,   		 data_out
-		(	'1'	,	'0'	  ,		'1'		,X"0000" ,		X"ff"	,  X"00000000"	),  
-		(	'0'	,	'0'	  ,		'1'		,X"0000" ,  	X"ff"	,  X"00000000"	),  --testa escrita
+		(	'1'	,	'0'	  ,		'1'		,X"0000" ,		X"ff"	,  X"00000000"	),  --testa escrita
+		(	'0'	,	'0'	  ,		'1'		,X"0000" ,  	X"ff"	,  X"00000000"	),  
 		(	'1'	,	'0'	  ,		'1'		,X"0000" ,		X"ff"	,  X"00000000"	),
 		(	'0'	,	'0'	  ,		'1'		,X"0001" ,  	X"11"	,  X"00000000"	),  
 		(	'1'	,	'0'	  ,		'1'		,X"0001" ,		X"11"	,  X"00000000"	),
@@ -55,7 +55,7 @@ begin
 				data_in	        <=tabela_verdade(i).data_in;
 				wait for 1 ns;
 				data_out	        <=tabela_verdade(i).data_out;
-
+				wait for 1 ns;
      --           report to_String(i);
 				if i>=9 then--valida leitura (e também escrita feita anteriormente)
 					write(message, string'("ERRO NO DATAOUT "));

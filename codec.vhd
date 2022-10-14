@@ -21,8 +21,8 @@ end entity;
 architecture behavioral of codec is
 begin 
     process(interrupt)
-        file arq_entrada: text is "/home/alex/Documents/LabHardware/T1/trabVHDL/entrada_codec.dat";
-        file arq_saida: text open write_mode is "/home/alex/Documents/LabHardware/T1/trabVHDL/saida_codec.dat";
+        file arq_entrada: text is "caminho/do/projeto/entrada_codec.dat";
+        file arq_saida: text open write_mode is "caminho/do/projeto/saida_codec.dat";
         variable linha_dados_in: line;
         variable linha_dados_out: line;
         variable aux: std_logic_vector(7 downto 0);
