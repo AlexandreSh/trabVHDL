@@ -46,18 +46,21 @@ begin
                -- report to_string(auxint_endr);  report to_string(mem(auxint_endr));
               --  report to_string(bit_um); report to_string(bit_dois); report to_string(bit_tres); report to_string(bit_quatro);
                -- report to_string(data_out);
-              --  report to_string(aux_out);
                -- bit_um   := mem(to_unsigned(to_integer(aux_endr)),bit_um'length);
                 bit_um   := mem(auxint_endr);
+                report to_string(aux_out);
                 auxint_endr := auxint_endr +1;
               --  aux_endr := std_logic_vector(to_unsigned(to_integer(unsigned(aux_endr)) + 1, 16));
                 bit_dois := mem(auxint_endr);
+                report to_string(aux_out);
                 auxint_endr := auxint_endr +1;
               --  aux_endr := std_logic_vector(to_unsigned(to_integer(unsigned(aux_endr)) + 2, 16));
                 bit_tres := mem(auxint_endr);
+                report to_string(aux_out);
                 auxint_endr := auxint_endr +1;
               --  aux_endr := std_logic_vector(to_unsigned(to_integer(unsigned(aux_endr)) + 3, 16));
                 bit_quatro  := mem(auxint_endr);
+                report to_string(aux_out);
                 data_out <= aux_out;
             elsif (data_read = '0' and data_write = '1' and falling_edge(clock)) then --escreve na memoria
         
@@ -65,6 +68,7 @@ begin
                -- report to_string(data_in);
                 mem(to_integer(unsigned(data_addr))) := data_in; --compilou assim, mas acho que este loop é muita coisa só pra um ciclo de clock
                 --report to_String(mem(to_integer(unsigned(data_addr))));
+				assert mem(to_integer(unsigned(data_addr))) = data_in report "NAO ESCREVEU";
             end if;        
 
         end loop;
