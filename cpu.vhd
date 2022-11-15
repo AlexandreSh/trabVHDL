@@ -64,228 +64,230 @@ begin
         if halt = '1' then
             waitflag <= '1';
         end if;
-        case opcode is
-            when X"0" =>--halt
-                IP := IP + 1;
-                waitflag <= '1';
+        if waitflag /= '1' then
+            case opcode is
+                when X"0" =>--halt
+                    IP := IP + 1;
+                    waitflag <= '1';
 
-            when X"1" =>--in
-                data_write <= '1';
-                data_read <= '0';
-                codec_read <= '1';
-                codec_write <= '0';
-                --data_in <= codec_data_out;
-                data_in <= std_logic_vector(to_unsigned(to_integer(unsigned(codec_data_out)), (data_width*4)-1));
-                SP := SP + 1;
-                IP := IP + 1; 
-                --wait on clock;?
-
-            when X"2" =>--out
-                data_write <= '0';
-                data_read <= '1';
-                codec_read <= '0';
-                codec_write <= '1';
-                SP := SP - 1;
-                codec_data_in <= data_out;
-                IP := IP + 1;
-
-            when X"3" =>--puship
-                data_write <= '1';
-                data_read <= '0';
-                codec_read <= '0';
-                codec_write <= '0';
-                data_in <= std_logic_vector(to_unsigned(to_integer(unsigned(instruction_addr)), (data_width*4)-1));
-                --wait on clock;?
-                SP := SP + 2;
-                IP := IP + 1;
-
-            when X"4" =>--pushimm
-                data_write <= '1';
-                data_read <= '0';
-                codec_read <= '0';
-                codec_write <= '0';
-                data_in <= std_logic_vector(to_unsigned(to_integer(unsigned(immediate)), (data_width*4)-1));
-                SP := SP + 1;
-                IP := IP + 1;
-
-            when X"5" =>--drop
-                SP := SP - 1;
-                IP := IP + 1;
-
-            when X"6" =>--dup
-                data_write <= '1';
-                data_read <= '0';
-                codec_read <= '0';
-                codec_write <= '0';
-                temp_data := data_out;
-                data_in <= std_logic_vector(to_unsigned(to_integer(unsigned(temp_data)), (data_width*4)-1));
-                IP := IP + 1;
-                SP := SP + 1;
-
-            when X"8" =>--add
-                codec_read <= '0';
-                codec_write <= '1';
-                if auxcont = 0 then
-                    data_write <= '0';
-                    data_read <= '1';
-                    SP := SP - 1;
-                    temp_data := data_out;
-                    auxcont := 1;
-                else
+                when X"1" =>--in
                     data_write <= '1';
                     data_read <= '0';
-                    --data_in <= std_logic_vector(to_unsigned(to_integer(unsigned(data_out))+(to_unsigned(to_integer(unsigned(temp_data))))), (data_width*4)-1);
-                    data_in <= std_logic_vector(unsigned(data_out)+unsigned(temp_data));
+                    codec_read <= '1';
+                    codec_write <= '0';
+                    --data_in <= codec_data_out;
+                    data_in <= std_logic_vector(to_unsigned(to_integer(unsigned(codec_data_out)), (data_width*4)-1));
+                    SP := SP + 1;
+                    IP := IP + 1; 
+                    --wait on clock;?
+
+                when X"2" =>--out
+                    data_write <= '0';
+                    data_read <= '1';
+                    codec_read <= '0';
+                    codec_write <= '1';
+                    SP := SP - 1;
+                    codec_data_in <= data_out;
                     IP := IP + 1;
+
+                when X"3" =>--puship
+                    data_write <= '1';
+                    data_read <= '0';
+                    codec_read <= '0';
+                    codec_write <= '0';
+                    data_in <= std_logic_vector(to_unsigned(to_integer(unsigned(instruction_addr)), (data_width*4)-1));
+                    --wait on clock;?
                     SP := SP + 2;
-                    auxcont := 0;
-                end if;
+                    IP := IP + 1;
 
-            when X"9" =>--sub
-                codec_read <= '0';
-                codec_write <= '1';
-                if auxcont = 0 then
-                    data_write <= '0';
-                    data_read <= '1';
-                    SP := SP - 1;
-                    temp_data := data_out;
-                    auxcont := 1;
-                else 
+                when X"4" =>--pushimm
                     data_write <= '1';
                     data_read <= '0';
-                    data_in <= std_logic_vector(to_unsigned(to_integer(unsigned(temp_data)-(unsigned(data_out))), (data_width*4)-1));
+                    codec_read <= '0';
+                    codec_write <= '0';
+                    data_in <= std_logic_vector(to_unsigned(to_integer(unsigned(immediate)), (data_width*4)-1));
+                    SP := SP + 1;
+                    IP := IP + 1;
+
+                when X"5" =>--drop
+                    SP := SP - 1;
+                    IP := IP + 1;
+
+                when X"6" =>--dup
+                    data_write <= '1';
+                    data_read <= '0';
+                    codec_read <= '0';
+                    codec_write <= '0';
+                    temp_data := data_out;
+                    data_in <= std_logic_vector(to_unsigned(to_integer(unsigned(temp_data)), (data_width*4)-1));
                     IP := IP + 1;
                     SP := SP + 1;
-                    auxcont := 0;
-                end if;
 
-            when X"A" =>--nand
-                codec_read <= '0';
-                codec_write <= '1';
-                if auxcont = 0 then 
-                    data_write <= '0';
-                    data_read <= '1';
-                    SP := SP - 1;
-                    temp_data := data_out;
-                    auxcont := 1;
-                else
-                    data_write <= '1';
-                    data_read <= '0';
-                    data_in <= (std_logic_vector(to_unsigned(to_integer(unsigned(temp_data)), (data_width*4)-1)) nand data_out);
-                    IP := IP + 1;
-                    SP := SP + 1;
-                    auxcont := 0;
-                end if;
-
-            when X"B" =>--slt
-                codec_read <= '0';
-                codec_write <= '1';
-                if auxcont = 0 then
-                    data_write <= '0';
-                    data_read <= '1';
-                    SP := SP - 1;
-                    temp_data := data_out;
-                    auxcont := 1;
-                else            
-                    data_write <= '1';
-                    data_read <= '0';
-                --  if (to_unsigned(to_integer(unsigned(temp_data))))<(to_unsigned(to_integer(unsigned(data_out)))) then
-                    if unsigned(temp_data)<unsigned(data_out) then
-                        data_in <= X"1";
+                when X"8" =>--add
+                    codec_read <= '0';
+                    codec_write <= '1';
+                    if auxcont = 0 then
+                        data_write <= '0';
+                        data_read <= '1';
+                        SP := SP - 1;
+                        temp_data := data_out;
+                        auxcont := 1;
                     else
-                        data_in <= X"0";
+                        data_write <= '1';
+                        data_read <= '0';
+                        --data_in <= std_logic_vector(to_unsigned(to_integer(unsigned(data_out))+(to_unsigned(to_integer(unsigned(temp_data))))), (data_width*4)-1);
+                        data_in <= std_logic_vector(unsigned(data_out)+unsigned(temp_data));
+                        IP := IP + 1;
+                        SP := SP + 2;
+                        auxcont := 0;
                     end if;
-                    IP := IP + 1;
-                    SP := SP + 1;
-                    auxcont := 1;
-                end if;
 
-                
-            when X"C" =>--shl
-                codec_read <= '0';
-                codec_write <= '1';
-                if auxcont = 0 then
-                    data_write <= '0';
-                    data_read <= '1';
-                    SP := SP - 1;
-                    temp_data := data_out;
-                    auxcont := 1;
-                else
-                    data_write <= '1';
-                    data_read <= '0';
-                    data_in <= std_logic_vector(shift_left(unsigned(temp_data), to_integer(unsigned(data_out))));
-                    IP := IP + 1;
-                    SP := SP + 1;
-                    auxcont := 0;
-                end if;
-
-            when X"D" =>--shr
-                codec_read <= '0';
-                codec_write <= '1';
-                if auxcont = 0 then
-                    data_write <= '0';
-                    data_read <= '1';
-                    SP := SP - 1;
-                    temp_data := data_out;
-                    auxcont := 1;
-                else       
-                    data_write <= '1';
-                    data_read <= '0';
-                    data_in <= std_logic_vector(shift_right(unsigned(temp_data), to_integer(unsigned(data_out))));
-                    IP := IP + 1;
-                    SP := SP + 1;
-                    auxcont := 0;
-                end if;
-
-            when X"E" =>--jeq
-                data_write <= '0';
-                data_read <= '1';
-                codec_read <= '0';
-                codec_write <= '1';
-                if auxcont = 0 then
-                    SP := SP - 1;
-                    temp_data := data_out;
-                    auxcont := 1;
-                elsif auxcont = 1 then
-                    SP := SP - 1;
-                    temp_data1 := data_out;
-                    auxcont := 2;
-                elsif auxcont = 2 then
-                    SP := SP - 1;
-                    temp_data2 := data_out;
-                    auxcont := 3;
-                elsif auxcont = 3 then
-                    SP := SP - 1;
-                    temp_data3 := data_out;
-                    auxcont := 4;
-                elsif auxcont = 4 then    
-                    if temp_data = temp_data1 then
-                        IP := IP+to_integer(unsigned(temp_data3&temp_data2));
+                when X"9" =>--sub
+                    codec_read <= '0';
+                    codec_write <= '1';
+                    if auxcont = 0 then
+                        data_write <= '0';
+                        data_read <= '1';
+                        SP := SP - 1;
+                        temp_data := data_out;
+                        auxcont := 1;
+                    else 
+                        data_write <= '1';
+                        data_read <= '0';
+                        data_in <= std_logic_vector(to_unsigned(to_integer(unsigned(temp_data)-(unsigned(data_out))), (data_width*4)-1));
+                        IP := IP + 1;
                         SP := SP + 1;
+                        auxcont := 0;
                     end if;
-                    IP := IP + 1;
-                    auxcont := 0;
-                end if;
 
-            when X"F" =>--jmp
-                data_write <= '0';
-                data_read <= '1';
-                codec_read <= '0';
-                codec_write <= '1';
-                if auxcont = 0 then
-                    SP := SP - 1;
-                    temp_data := data_out;
-                    auxcont := 1;
-                else    
-                    IP := to_integer(unsigned(temp_data&data_out));
-                    auxcont := 0;
-                end if;
-                
-            when others => --noop?
-                IP := IP+1;
-        end case;
-        instruction_addr <= std_logic_vector(to_unsigned(IP, addr_width));
-        data_addr <= std_logic_vector(to_unsigned(SP,  addr_width));
+                when X"A" =>--nand
+                    codec_read <= '0';
+                    codec_write <= '1';
+                    if auxcont = 0 then 
+                        data_write <= '0';
+                        data_read <= '1';
+                        SP := SP - 1;
+                        temp_data := data_out;
+                        auxcont := 1;
+                    else
+                        data_write <= '1';
+                        data_read <= '0';
+                        data_in <= (std_logic_vector(to_unsigned(to_integer(unsigned(temp_data)), (data_width*4)-1)) nand data_out);
+                        IP := IP + 1;
+                        SP := SP + 1;
+                        auxcont := 0;
+                    end if;
+
+                when X"B" =>--slt
+                    codec_read <= '0';
+                    codec_write <= '1';
+                    if auxcont = 0 then
+                        data_write <= '0';
+                        data_read <= '1';
+                        SP := SP - 1;
+                        temp_data := data_out;
+                        auxcont := 1;
+                    else            
+                        data_write <= '1';
+                        data_read <= '0';
+                    --  if (to_unsigned(to_integer(unsigned(temp_data))))<(to_unsigned(to_integer(unsigned(data_out)))) then
+                        if unsigned(temp_data)<unsigned(data_out) then
+                            data_in <= X"1";
+                        else
+                            data_in <= X"0";
+                        end if;
+                        IP := IP + 1;
+                        SP := SP + 1;
+                        auxcont := 1;
+                    end if;
+
+                    
+                when X"C" =>--shl
+                    codec_read <= '0';
+                    codec_write <= '1';
+                    if auxcont = 0 then
+                        data_write <= '0';
+                        data_read <= '1';
+                        SP := SP - 1;
+                        temp_data := data_out;
+                        auxcont := 1;
+                    else
+                        data_write <= '1';
+                        data_read <= '0';
+                        data_in <= std_logic_vector(shift_left(unsigned(temp_data), to_integer(unsigned(data_out))));
+                        IP := IP + 1;
+                        SP := SP + 1;
+                        auxcont := 0;
+                    end if;
+
+                when X"D" =>--shr
+                    codec_read <= '0';
+                    codec_write <= '1';
+                    if auxcont = 0 then
+                        data_write <= '0';
+                        data_read <= '1';
+                        SP := SP - 1;
+                        temp_data := data_out;
+                        auxcont := 1;
+                    else       
+                        data_write <= '1';
+                        data_read <= '0';
+                        data_in <= std_logic_vector(shift_right(unsigned(temp_data), to_integer(unsigned(data_out))));
+                        IP := IP + 1;
+                        SP := SP + 1;
+                        auxcont := 0;
+                    end if;
+
+                when X"E" =>--jeq
+                    data_write <= '0';
+                    data_read <= '1';
+                    codec_read <= '0';
+                    codec_write <= '1';
+                    if auxcont = 0 then
+                        SP := SP - 1;
+                        temp_data := data_out;
+                        auxcont := 1;
+                    elsif auxcont = 1 then
+                        SP := SP - 1;
+                        temp_data1 := data_out;
+                        auxcont := 2;
+                    elsif auxcont = 2 then
+                        SP := SP - 1;
+                        temp_data2 := data_out;
+                        auxcont := 3;
+                    elsif auxcont = 3 then
+                        SP := SP - 1;
+                        temp_data3 := data_out;
+                        auxcont := 4;
+                    elsif auxcont = 4 then    
+                        if temp_data = temp_data1 then
+                            IP := IP+to_integer(unsigned(temp_data3&temp_data2));
+                            SP := SP + 1;
+                        end if;
+                        IP := IP + 1;
+                        auxcont := 0;
+                    end if;
+
+                when X"F" =>--jmp
+                    data_write <= '0';
+                    data_read <= '1';
+                    codec_read <= '0';
+                    codec_write <= '1';
+                    if auxcont = 0 then
+                        SP := SP - 1;
+                        temp_data := data_out;
+                        auxcont := 1;
+                    else    
+                        IP := to_integer(unsigned(temp_data&data_out));
+                        auxcont := 0;
+                    end if;
+                    
+                when others => --noop?
+                    IP := IP+1;
+            end case;
+            instruction_addr <= std_logic_vector(to_unsigned(IP, addr_width));
+            data_addr <= std_logic_vector(to_unsigned(SP,  addr_width));
+        end if;
     end process;
     
 end architecture;
