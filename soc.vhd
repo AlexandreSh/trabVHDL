@@ -29,7 +29,11 @@ architecture structural of soc is
     signal codec_valid_aux: std_logic;
     signal codec_data_out_aux: std_logic_vector(7 downto 0);
     signal codec_data_in_aux: std_logic_vector(7 downto 0);
+    -- signal select_imem_or_soc: std_logic;
+    -- signal saida_mux2_imem_or_soc: std_logic_vector(data_width-1 downto 0);
 begin
+    -- mux2_imem_or_soc: entity work.mux2(dataflow)
+    --                    port map(d0 => instruction_in_aux, d1 => firmware_filename, c => select_imem_or_soc, r => saida_mux2_imem_or_soc);
     cpu: entity work.cpu(behavioral_cpu)
             port map(clock => clock, halt, instruction_in => instruction_in_aux, instruction_addr => instruction_addr_aux, 
                      data_read => data_read_aux, data_write => data_write_aux, data_addr => data_addr_aux, data_in => data_in_aux, 

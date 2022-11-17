@@ -2,3 +2,7 @@ v 4
 file . "codec.vhd" "20f1ba30819dceb04fe26ec8105baf448a0c6054" "20221011113513.477":
   entity codec at 1( 0) + 0 on 11;
   architecture behavioral of codec at 19( 486) + 0 on 12;
+file . "mux2.vhd" "96763d288bb971de98d2b601ad6eabbafffabbaa" "20221117102422.670":
+  entity mux2 at 1( 0) + 0 on 16;
+  architecture dataflow of mux2 at 15( 327) + 0 on 17;
+  architecture algorithm of mux2 at 20( 419) + 0 on 18;
