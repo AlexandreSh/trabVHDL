@@ -35,7 +35,7 @@ begin
     -- mux2_imem_or_soc: entity work.mux2(dataflow)
     --                    port map(d0 => instruction_in_aux, d1 => firmware_filename, c => select_imem_or_soc, r => saida_mux2_imem_or_soc);
     cpu: entity work.cpu(behavioral_cpu)
-            port map(clock => clock, halt, instruction_in => instruction_in_aux, instruction_addr => instruction_addr_aux, 
+            port map(clock => clock, halt => '0', instruction_in => instruction_in_aux, instruction_addr => instruction_addr_aux, 
                      data_read => data_read_aux, data_write => data_write_aux, data_addr => data_addr_aux, data_in => data_in_aux, 
                      data_out => data_out_aux, codec_interrupt => codec_interrupt_aux, codec_read => codec_read_aux, codec_write => codec_write_aux,
                      codec_valid => codec_valid_aux, codec_data_out => codec_data_out_aux, codec_data_in => codec_data_in_aux);
