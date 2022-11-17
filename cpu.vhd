@@ -75,7 +75,7 @@ begin
         -- OUT signal   data_read, data_write, codec_interrupt, codec_read, codec_write
         
     begin --if clock = 1
-        if waitflag = '1' then
+        if waitflag = '1' or opcode = X"0" or halt = '1' then
             SP := 0;
             IP := 0;
         else
