@@ -47,21 +47,11 @@ end entity;
 
 architecture behavioral_cpu of cpu is 
     signal waitflag: std_logic := '0';
+    signal masked_clock: std_logic := '0';
 begin
-    waiter : process 
-    begin
-        if halt = '1' then
-            waitflag <= '1';
-            wait until falling_edge(halt);
-        end if;
-        if instruction_in(7 downto 4) = X"0" then
-            waitflag <= '1';
-            wait until instruction_in(7 downto 4) /= X"0";
-        end if;
-        waitflag <= '0';
-        wait until clock'event;
-    end process;
-    process(halt, clock)
+    masked_clock <= '0' when (halt = '1' or instruction_in(7 downto 4) = X"0") else clock when halt = '0'; --clock secundário que gerencia o halt
+
+    process(halt, masked_clock)
         variable temp_data: std_logic_vector(data_width-1 downto 0);
         variable temp_data1: std_logic_vector(data_width-1 downto 0);
         variable temp_data2: std_logic_vector(data_width-1 downto 0);
@@ -75,10 +65,10 @@ begin
         -- OUT signal   data_read, data_write, codec_interrupt, codec_read, codec_write
         
     begin --if clock = 1
-        if waitflag = '1' or opcode = X"0" or halt = '1' then
+        if halt = '1' then
             SP := 0;
             IP := 0;
-        else
+        elsif masked_clock = '1' then
             case opcode is
                 when X"0" =>--halt
                     --wait until falling_edge'halt;
